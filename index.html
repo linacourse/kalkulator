@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор рассрочки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('assets/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор рассрочки</h1>
+        <label for="cost">Стоимость апартамента (руб.):</label>
+        <input type="number" id="cost" placeholder="Введите стоимость" required>
+        <button onclick="calculate()">Рассчитать</button>
+        <div id="results">
+            <table id="resultTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Срок</th>
+                        <th>Первоначальный Взнос (%)</th>
+                        <th>Удорожание (%)</th>
+                        <th>Первоначальный Взнос (руб.)</th>
+                        <th>Ежемесячный платеж (руб.)</th>
+                        <th>Ежеквартальный платеж (руб.)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function calculate() {
+            const cost = parseFloat(document.getElementById('cost').value);
+            const resultBody = document.getElementById('resultBody');
+            const resultTable = document.getElementById('resultTable');
+
+            if (isNaN(cost)) {
+                alert("Пожалуйста, введите корректную стоимость.");
+                return;
+            }
+            // Очищаем предыдущие результаты
+            resultBody.innerHTML = '';
+            // Данные для расчета
+            const data = [
+                {term: "12 месяцев", initialPaymentPercent: 0.3, overpricePercent: 0.03, months: 12},
+                {term: "12 месяцев", initialPaymentPercent: 0.5, overpricePercent: 0.02, months: 12},
+                {term: "12 месяцев", initialPaymentPercent: 0.7, overpricePercent: 0, months: 12},
+                {term: "24 месяцев", initialPaymentPercent: 0.5, overpricePercent: 0.1, months: 24},
+                {term: "24 месяцев", initialPaymentPercent: 0.7, overpricePercent: 0.05, months: 24}
+            ];
+            data.forEach(item => {
+                const totalWithOverprice = cost * (1 + item.overpricePercent);
+                const initialPayment = totalWithOverprice * item.initialPaymentPercent;
+                const remainingAmount = totalWithOverprice - initialPayment;
+
+                const monthlyPayment = remainingAmount / item.months;
+                const quarterlyPayment = monthlyPayment * 3;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${item.term}</td><td>${(item.initialPaymentPercent * 100).toFixed(1)}%</td><td>${(item.overpricePercent * 100).toFixed(1)}%</td><td>${Math.round(initialPayment)}</td><td>${Math.round(monthlyPayment)}</td><td>${Math.round(quarterlyPayment)}</td>`;
+                resultBody.appendChild(row);
+            });
+            resultTable.style.display = 'table';
+        }
+    </script>
+</body>
+</html>
